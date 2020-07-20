@@ -1,6 +1,6 @@
 
 # Pathfinding Visualizer
-Visualize some of computer sciences most famous path finding algorithms in this React.js application.
+Hello and welcome to my Path Finding Visualizer. I created this app while studying path finding algorithms and react, and thought this project would be a good way to tie them together while building my portfolio. The final project can be visited at https://nghinton.github.io/PathFinding-Visualizer/ and allows a user to visualize Breadth First Search, Depth First Search, Djsktra and A* algorithms. Clement Mihailescu provided an invaluable tutorial for this project, located at https://github.com/clementmihailescu/Pathfinding-Visualizer-Tutorial I hope you find this useful for your own projects, or simply enjoy playing around with the finished product!
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
