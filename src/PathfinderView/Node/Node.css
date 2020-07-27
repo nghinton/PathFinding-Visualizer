@@ -6,11 +6,61 @@
 }
 
 .node-finish {
-  background-color: red;
+  animation-name: finishAnimation;
+  animation-duration: 0.2s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+}
+
+@keyframes finishAnimation {
+  0% {
+    transform: scale(0.6);
+    background-color: red;
+    border-radius: 100%;
+  }
+
+  50% {
+    transform: scale(1.2);
+    background-color: red;
+  }
+
+  100% {
+    transform: scale(1);
+    background-color: red;
+  }
 }
 
 .node-start {
-  background-color: green;
+  animation-name: startAnimation;
+  animation-duration: 0.2s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+}
+
+@keyframes startAnimation {
+  0% {
+    transform: scale(0.6);
+    background-color: green;
+    border-radius: 100%;
+  }
+
+  50% {
+    transform: scale(1.2);
+    background-color: green;
+  }
+
+  100% {
+    transform: scale(1);
+    background-color: green;
+  }
 }
 
 .node-wall {
