@@ -23,13 +23,13 @@ export default class Node extends Component {
       : '';
 
     return (
-      <div
+      <td
         id={`node-${row}-${col}`}
         className={`node ${extraClassName}`}
         onMouseDown={() => onMouseDown(row, col)}
         onMouseEnter={() => onMouseEnter(row, col)}
         onMouseUp={() => onMouseUp()}
-      ></div>
+      ></td>
     );
   }
 }

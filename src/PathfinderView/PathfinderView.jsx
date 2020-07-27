@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import $ from 'jquery';
 
 import Container from 'react-bootstrap/Container';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -9,18 +10,18 @@ import { dijkstra, getNodesInShortestPathOrder } from '../algorithms/dijkstra';
 
 import './PathfinderView.css';
 
-const NUMBER_OF_ROWS = 20;
-const NUMBER_OF_COLUMNS = 40;
+const NUMBER_OF_ROWS = Math.floor($(window).innerHeight() * 0.88 / 25);
+const NUMBER_OF_COLUMNS = 60;
 
 export default class PathfindingView extends Component {
   constructor() {
     super();
     this.state = {
       grid: [],
-      START_NODE_ROW: 10,
-      START_NODE_COL: 10,
-      FINISH_NODE_ROW: 10,
-      FINISH_NODE_COL: 30,
+      START_NODE_ROW: Math.floor(NUMBER_OF_ROWS / 2),
+      START_NODE_COL: 15,
+      FINISH_NODE_ROW: Math.floor(NUMBER_OF_ROWS / 2),
+      FINISH_NODE_COL: 45,
       mouseIsPressed: false,
       movingStartNode: false,
       movingFinishNode: false,
@@ -236,30 +237,32 @@ export default class PathfindingView extends Component {
           </div>
         </Container>
 
-        <div className='grid-container'>
-          {grid.map((row, rowIdx) => {
-            return (
-              <div key={rowIdx}>
-                {row.map((node, nodeIdx) => {
-                  const { row, col, isFinish, isStart, isWall } = node;
-                  return (
-                    <Node
-                      key={nodeIdx}
-                      col={col}
-                      isFinish={isFinish}
-                      isStart={isStart}
-                      isWall={isWall}
-                      mouseIsPressed={mouseIsPressed}
-                      onMouseDown={(row, col) => this.handleMouseDown(row, col)}
-                      onMouseEnter={(row, col) => this.handleMouseEnter(row, col)}
-                      onMouseUp={() => this.handleMouseUp()}
-                      row={row}
-                    ></Node>
-                  );
-                })}
-              </div>
-            );
-          })}
+        <div className='table-container'>
+          <table className='table'>
+            {grid.map((row, rowIdx) => {
+              return (
+                <tr key={rowIdx}>
+                  {row.map((node, nodeIdx) => {
+                    const { row, col, isFinish, isStart, isWall } = node;
+                    return (
+                      <Node
+                        key={nodeIdx}
+                        col={col}
+                        isFinish={isFinish}
+                        isStart={isStart}
+                        isWall={isWall}
+                        mouseIsPressed={mouseIsPressed}
+                        onMouseDown={(row, col) => this.handleMouseDown(row, col)}
+                        onMouseEnter={(row, col) => this.handleMouseEnter(row, col)}
+                        onMouseUp={() => this.handleMouseUp()}
+                        row={row}
+                      ></Node>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </table>
         </div>
 
       </div>
