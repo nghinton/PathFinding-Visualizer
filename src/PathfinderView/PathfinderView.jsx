@@ -5,7 +5,9 @@ import Container from 'react-bootstrap/Container';
 import Dropdown from 'react-bootstrap/Dropdown';
 
 import Node from './Node/Node';
-import { dijkstra, getNodesInShortestPathOrder } from '../algorithms/dijkstra';
+import { dijkstra } from '../algorithms/dijkstra';
+import { depthFirst } from '../algorithms/depthFirst';
+import { breadthFirst } from '../algorithms/breadthFirst';
 
 import './PathfinderView.css';
 
@@ -87,7 +89,15 @@ export default class PathfindingView extends Component {
   }
 
   setDijkstra() {
-    this.setState({ algorithm: 1})
+    this.setState({ algorithm: 1, algorithmChoice: 'Dijkstra\'s'});
+  }
+
+  setDepthFirst() {
+    this.setState({ algorithm: 2, algorithmChoice: 'Depth First'});
+  }
+
+  setBreadthFirst() {
+    this.setState({ algorithm: 3, algorithmChoice: 'Breadth First'});
   }
 
   clearBoard() {
@@ -131,6 +141,29 @@ export default class PathfindingView extends Component {
     }
   }
 
+  mazeRandom() {
+    this.clearWalls();
+    const grid = this.state.grid;
+    const wallsToAnimate = [];
+    for (let i = 0; i < NUMBER_OF_ROWS; i++) {
+      for (let j = 0; j < NUMBER_OF_COLUMNS; j++) {
+        if (Math.random() < 0.25) {
+          if (!(i === this.state.START_NODE_ROW && j === this.state.START_NODE_COL) && !(i === this.state.FINISH_NODE_ROW && j === this.state.FINISH_NODE_COL)) {
+            wallsToAnimate.push([i,j]);
+          }
+        }
+      }
+    }
+    for (let i = 0; i < wallsToAnimate.length; i++) {
+      const [row, col] = wallsToAnimate[i];
+      const node = grid[row][col];
+      node.isWall = true;
+      setTimeout(() => {
+        document.getElementById(`node-${row}-${col}`).className = 'node node-wall';
+      }, i * this.state.speed);
+    }
+  }
+
   visualizeAlgorithm() {
     this.clearPath();
     const {algorithm} = this.state;
@@ -138,6 +171,12 @@ export default class PathfindingView extends Component {
     switch (algorithm) {
       case(1) :
         this.setState({pathFinding : true}, () => this.visualizeDijkstra());
+        break;
+      case(2) :
+        this.setState({pathFinding : true}, () => this.visualizeDepthFirst());
+        break;
+      case(3) :
+        this.setState({pathFinding : true}, () => this.visualizeBreadthFirst());
         break;
       default :
         this.setState({pathFinding : true}, () => this.visualizeDijkstra());
@@ -150,15 +189,57 @@ export default class PathfindingView extends Component {
     const startNode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
     const finishNode = grid[this.state.FINISH_NODE_ROW][this.state.FINISH_NODE_COL];
     const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
-    console.log(visitedNodesInOrder);
-    const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
-    this.animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder);
+    const nodesInShortestPathOrder = this.getNodesInShortestPathOrder(finishNode);
+    
+    this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
+
     setTimeout(() => {
       this.setState({pathFinding: false});
     }, (visitedNodesInOrder.length * 10 + nodesInShortestPathOrder.length * 50) * this.state.speed);
   }
 
-  animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder) {
+  
+  visualizeDepthFirst() {
+    const grid = this.state.grid;
+    const startNode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+    const finishNode = grid[this.state.FINISH_NODE_ROW][this.state.FINISH_NODE_COL];
+    const visitedNodesInOrder = depthFirst(grid, startNode, finishNode);
+    const nodesInShortestPathOrder = this.getNodesInShortestPathOrder(finishNode);
+    
+    console.log(visitedNodesInOrder);
+
+    this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
+    
+    setTimeout(() => {
+      this.setState({pathFinding: false});
+    }, (visitedNodesInOrder.length * 10 + nodesInShortestPathOrder.length * 50) * this.state.speed);
+  }
+
+  visualizeBreadthFirst() {
+    const grid = this.state.grid;
+    const startNode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+    const finishNode = grid[this.state.FINISH_NODE_ROW][this.state.FINISH_NODE_COL];
+    const visitedNodesInOrder = breadthFirst(grid, startNode, finishNode);
+    const nodesInShortestPathOrder = this.getNodesInShortestPathOrder(finishNode);
+
+    this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
+    
+    setTimeout(() => {
+      this.setState({pathFinding: false});
+    }, (visitedNodesInOrder.length * 10 + nodesInShortestPathOrder.length * 50) * this.state.speed);
+  }
+
+  getNodesInShortestPathOrder(finishNode) {
+    const nodesInShortestPathOrder = [];
+    let currentNode = finishNode;
+    while (currentNode !== null) {
+      nodesInShortestPathOrder.unshift(currentNode);
+      currentNode = currentNode.previousNode;
+    }
+    return nodesInShortestPathOrder;
+  }
+
+  animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder) {
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
       if (i === visitedNodesInOrder.length) {
         setTimeout(() => {
@@ -174,7 +255,7 @@ export default class PathfindingView extends Component {
       }, this.state.speed * 10 * i);
     }
   }
-
+ 
   animateShortestPath(nodesInShortestPathOrder) {
     for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
       setTimeout(() => {
@@ -214,6 +295,8 @@ export default class PathfindingView extends Component {
 
               <Dropdown.Menu>
                 <Dropdown.Item onClick={() => this.setDijkstra()}>Dijkstra's</Dropdown.Item>
+                <Dropdown.Item onClick={() => this.setDepthFirst()}>Depth First</Dropdown.Item>
+                <Dropdown.Item onClick={() => this.setBreadthFirst()}>Breadth First</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
 
@@ -233,28 +316,33 @@ export default class PathfindingView extends Component {
               </Dropdown.Menu>
             </Dropdown>
 
+            <button disabled={pathFinding ? true : false} onClick={() => this.mazeRandom()}>
+              Create Random Maze
+            </button>
+
           </div>
         </Container>
 
         <div id='mainText'>
           <ul>
             <li>
-              <div class="start"></div>Start Node</li>
+              <div className="start"></div>Start Node</li>
             <li>
-              <div class="finish"></div>Finish Node</li>
+              <div className="finish"></div>Finish Node</li>
             <li>
-              <div class="unvisited"></div>Unvisited Nodes</li>
+              <div className="unvisited"></div>Unvisited Nodes</li>
             <li>
-              <div class="visited"></div>Visited Nodes</li>
+              <div className="visited"></div>Visited Nodes</li>
             <li>
-              <div class="shortest-path"></div>Shortest-path Node</li>
+              <div className="shortest-path"></div>Shortest-path Node</li>
             <li>
-              <div class="wall"></div>Wall Node</li>
+              <div className="wall"></div>Wall Node</li>
           </ul>
         </div>
 
         <div className='table-container'>
           <table className='table'>
+          <tbody>
             {grid.map((row, rowIdx) => {
               return (
                 <tr key={rowIdx}>
@@ -278,6 +366,7 @@ export default class PathfindingView extends Component {
                 </tr>
               );
             })}
+          </tbody>
           </table>
         </div>
 
