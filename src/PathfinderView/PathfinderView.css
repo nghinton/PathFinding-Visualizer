@@ -64,14 +64,101 @@ body {
   }
 
   .navbar button:hover {
-    color: rgb(58, 238, 82);
-    background-color: #34495e;
-  }
-
-  .Button:hover {
-    background-color: #34495e;
+    outline: 2px solid white;
   }
 
   .navbar button:focus {
-    outline: 0;
+    outline: 2px solid white;
+  }
+
+  .navbar #dropdown-basic {
+    background-color:#34495e;
+  }
+
+  .navbar #dropdown-basic:focus {
+    box-shadow: none;
+  }
+
+  .navbar a:active {
+    background-color: white;
+    color: black;
+  }
+
+  #mainText {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: #34495e;
+    color: white;
+    list-style: none;
+  }
+
+  #mainText li {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 16px;
+    text-align: center;
+    padding: 14px 16px;
+  }
+
+  #mainText ul {
+    display: flex;
+    flex-direction: row;
+    font-size: 16px;
+    text-align: center;
+    margin: 0px;
+    padding: 0px;
+  }
+
+  #mainText div {
+    width: 25px;
+    height: 25px;
+    display: inline-block;
+    margin: 0 5px 0 0;
+  }
+
+  .start {
+    background-color: green;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  .finish {
+    background-color: red;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  .unvisited {
+    background-color: white;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  .visited {
+    background-color: rgba(0, 190, 218, 0.75);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  .shortest-path {
+    background-color: rgb(255, 254, 106);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  .wall {
+    background-color: #34495e;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    outline: 1px solid white;
   }

@@ -3,14 +3,13 @@ import $ from 'jquery';
 
 import Container from 'react-bootstrap/Container';
 import Dropdown from 'react-bootstrap/Dropdown';
-import Button from 'react-bootstrap/Button';
 
 import Node from './Node/Node';
 import { dijkstra, getNodesInShortestPathOrder } from '../algorithms/dijkstra';
 
 import './PathfinderView.css';
 
-const NUMBER_OF_ROWS = Math.floor($(window).innerHeight() * 0.88 / 25);
+const NUMBER_OF_ROWS = Math.floor($(window).innerHeight() * 0.77 / 25);
 const NUMBER_OF_COLUMNS = 60;
 
 export default class PathfindingView extends Component {
@@ -38,8 +37,8 @@ export default class PathfindingView extends Component {
     this.setState({ grid });
   }
 
-  handleTest() {
-    console.log(this.state);
+  refreshPage() {
+    window.location.reload();
   }
 
   handleMouseDown(row, col) {
@@ -196,7 +195,7 @@ export default class PathfindingView extends Component {
         <Container fluid>
           <div className="navbar">
 
-            <Button onClick={() => this.handleTest()}> Test Grid</Button>
+            <button onClick={() => this.refreshPage()}>Pathfinding Visualizer</button>
 
             <button disabled={pathFinding ? true : false} onClick={() => this.clearBoard()}>
               Clear Board
@@ -236,6 +235,23 @@ export default class PathfindingView extends Component {
 
           </div>
         </Container>
+
+        <div id='mainText'>
+          <ul>
+            <li>
+              <div class="start"></div>Start Node</li>
+            <li>
+              <div class="finish"></div>Finish Node</li>
+            <li>
+              <div class="unvisited"></div>Unvisited Nodes</li>
+            <li>
+              <div class="visited"></div>Visited Nodes</li>
+            <li>
+              <div class="shortest-path"></div>Shortest-path Node</li>
+            <li>
+              <div class="wall"></div>Wall Node</li>
+          </ul>
+        </div>
 
         <div className='table-container'>
           <table className='table'>
