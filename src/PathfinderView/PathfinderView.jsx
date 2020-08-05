@@ -11,6 +11,7 @@ import { depthFirst } from '../algorithms/depthFirst';
 import { breadthFirst } from '../algorithms/breadthFirst';
 import { randomMaze } from '../algorithms/randomMaze';
 import { primMaze } from '../algorithms/primMaze';
+import { recursiveMaze } from '../algorithms/recursiveMaze';
 
 import './PathfinderView.css';
 
@@ -183,6 +184,30 @@ export default class PathfindingView extends Component {
     const finishNode = grid[this.state.FINISH_NODE_ROW][this.state.FINISH_NODE_COL];
 
     const wallsToAnimate = primMaze(grid, NUMBER_OF_ROWS, NUMBER_OF_COLUMNS);
+    
+    for (let i = 0; i < wallsToAnimate.length; i++) {
+      const node = wallsToAnimate[i];
+      if (node === startNode || node === finishNode) {
+        node.isWall = false; 
+        continue;
+      }
+      node.isWall = true;
+      setTimeout(() => {
+        document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-wall';
+      }, i * this.state.speed);
+    }
+
+  }
+
+  mazeRecursive() {
+    this.setState({ mazeText: 'Recursive Division Maze' })
+    this.clearWalls();
+    const grid = this.state.grid;
+
+    const startNode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+    const finishNode = grid[this.state.FINISH_NODE_ROW][this.state.FINISH_NODE_COL];
+
+    const wallsToAnimate = recursiveMaze(grid, NUMBER_OF_ROWS, NUMBER_OF_COLUMNS);
     
     for (let i = 0; i < wallsToAnimate.length; i++) {
       const node = wallsToAnimate[i];
@@ -373,6 +398,7 @@ export default class PathfindingView extends Component {
               <Dropdown.Menu>
                 <Dropdown.Item onClick={() => this.mazeRandom()}>Random Maze</Dropdown.Item>
                 <Dropdown.Item onClick={() => this.mazePrims()}>Prim's Maze</Dropdown.Item>
+                <Dropdown.Item onClick={() => this.mazeRecursive()}>Recursive Division Maze</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
 
