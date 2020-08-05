@@ -5,9 +5,11 @@ import Container from 'react-bootstrap/Container';
 import Dropdown from 'react-bootstrap/Dropdown';
 
 import Node from './Node/Node';
-import { dijkstra } from '../algorithms/dijkstra';
+import { astar } from '../algorithms/astar';
 import { depthFirst } from '../algorithms/depthFirst';
 import { breadthFirst } from '../algorithms/breadthFirst';
+import { randomMaze } from '../algorithms/randomMaze';
+import { primMaze } from '../algorithms/primMaze';
 
 import './PathfinderView.css';
 
@@ -28,9 +30,10 @@ export default class PathfindingView extends Component {
       movingFinishNode: false,
       pathFinding: false,
       algorithm: 1,
-      algorithmChoice: 'Dijkstra\'s',
+      algorithmChoice: 'A* Search',
       speed: 1,
-      speedChoice: 'Average'
+      speedChoice: 'Average',
+      mazeText: 'Create Maze'
     };
   }
 
@@ -88,8 +91,8 @@ export default class PathfindingView extends Component {
     this.setState({ speed: 0.5, speedChoice: 'Fast'});
   }
 
-  setDijkstra() {
-    this.setState({ algorithm: 1, algorithmChoice: 'Dijkstra\'s'});
+  setAstar() {
+    this.setState({ algorithm: 1, algorithmChoice: 'A* Search'});
   }
 
   setDepthFirst() {
@@ -142,26 +145,51 @@ export default class PathfindingView extends Component {
   }
 
   mazeRandom() {
+    this.setState({ mazeText: 'Random Maze' })
     this.clearWalls();
     const grid = this.state.grid;
-    const wallsToAnimate = [];
-    for (let i = 0; i < NUMBER_OF_ROWS; i++) {
-      for (let j = 0; j < NUMBER_OF_COLUMNS; j++) {
-        if (Math.random() < 0.25) {
-          if (!(i === this.state.START_NODE_ROW && j === this.state.START_NODE_COL) && !(i === this.state.FINISH_NODE_ROW && j === this.state.FINISH_NODE_COL)) {
-            wallsToAnimate.push([i,j]);
-          }
-        }
-      }
-    }
+
+    const startNode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+    const finishNode = grid[this.state.FINISH_NODE_ROW][this.state.FINISH_NODE_COL];
+
+    const wallsToAnimate = randomMaze(grid, NUMBER_OF_ROWS, NUMBER_OF_COLUMNS);
+
     for (let i = 0; i < wallsToAnimate.length; i++) {
-      const [row, col] = wallsToAnimate[i];
-      const node = grid[row][col];
+      const node = wallsToAnimate[i];
+      if (node === startNode || node === finishNode) {
+        node.isWall = false; 
+        continue;
+      }
       node.isWall = true;
       setTimeout(() => {
-        document.getElementById(`node-${row}-${col}`).className = 'node node-wall';
+        document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-wall';
       }, i * this.state.speed);
     }
+
+  }
+
+  mazePrims() {
+    this.setState({ mazeText: 'Prim\'s Maze' })
+    this.clearWalls();
+    const grid = this.state.grid;
+
+    const startNode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+    const finishNode = grid[this.state.FINISH_NODE_ROW][this.state.FINISH_NODE_COL];
+
+    const wallsToAnimate = primMaze(grid, NUMBER_OF_ROWS, NUMBER_OF_COLUMNS);
+    
+    for (let i = 0; i < wallsToAnimate.length; i++) {
+      const node = wallsToAnimate[i];
+      if (node === startNode || node === finishNode) {
+        node.isWall = false; 
+        continue;
+      }
+      node.isWall = true;
+      setTimeout(() => {
+        document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-wall';
+      }, i * this.state.speed);
+    }
+
   }
 
   visualizeAlgorithm() {
@@ -170,7 +198,7 @@ export default class PathfindingView extends Component {
 
     switch (algorithm) {
       case(1) :
-        this.setState({pathFinding : true}, () => this.visualizeDijkstra());
+        this.setState({pathFinding : true}, () => this.visualizeAstar());
         break;
       case(2) :
         this.setState({pathFinding : true}, () => this.visualizeDepthFirst());
@@ -179,16 +207,16 @@ export default class PathfindingView extends Component {
         this.setState({pathFinding : true}, () => this.visualizeBreadthFirst());
         break;
       default :
-        this.setState({pathFinding : true}, () => this.visualizeDijkstra());
+        this.setState({pathFinding : true}, () => this.visualizeAstar());
         break;
     }
   }
 
-  visualizeDijkstra() {
+  visualizeAstar() {
     const grid = this.state.grid;
     const startNode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
     const finishNode = grid[this.state.FINISH_NODE_ROW][this.state.FINISH_NODE_COL];
-    const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
+    const visitedNodesInOrder = astar(grid, startNode, finishNode);
     const nodesInShortestPathOrder = this.getNodesInShortestPathOrder(finishNode);
     
     this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
@@ -206,8 +234,6 @@ export default class PathfindingView extends Component {
     const visitedNodesInOrder = depthFirst(grid, startNode, finishNode);
     const nodesInShortestPathOrder = this.getNodesInShortestPathOrder(finishNode);
     
-    console.log(visitedNodesInOrder);
-
     this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
     
     setTimeout(() => {
@@ -268,7 +294,7 @@ export default class PathfindingView extends Component {
   }
 
   render() {
-    const { grid, mouseIsPressed, pathFinding, algorithmChoice, speedChoice} = this.state;
+    const { grid, mouseIsPressed, pathFinding, algorithmChoice, speedChoice, mazeText} = this.state;
 
     return (
       <div className='app-container'>
@@ -294,7 +320,7 @@ export default class PathfindingView extends Component {
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
-                <Dropdown.Item onClick={() => this.setDijkstra()}>Dijkstra's</Dropdown.Item>
+                <Dropdown.Item onClick={() => this.setAstar()}>A* Search</Dropdown.Item>
                 <Dropdown.Item onClick={() => this.setDepthFirst()}>Depth First</Dropdown.Item>
                 <Dropdown.Item onClick={() => this.setBreadthFirst()}>Breadth First</Dropdown.Item>
               </Dropdown.Menu>
@@ -316,9 +342,16 @@ export default class PathfindingView extends Component {
               </Dropdown.Menu>
             </Dropdown>
 
-            <button disabled={pathFinding ? true : false} onClick={() => this.mazeRandom()}>
-              Create Random Maze
-            </button>
+            <Dropdown>
+              <Dropdown.Toggle variant="success" id="dropdown-basic">
+                {mazeText}
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => this.mazeRandom()}>Random Maze</Dropdown.Item>
+                <Dropdown.Item onClick={() => this.mazePrims()}>Prim's Maze</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
 
           </div>
         </Container>
@@ -341,7 +374,7 @@ export default class PathfindingView extends Component {
         </div>
 
         <div className='table-container'>
-          <table className='table'>
+          <table id='grid' className='table'>
           <tbody>
             {grid.map((row, rowIdx) => {
               return (

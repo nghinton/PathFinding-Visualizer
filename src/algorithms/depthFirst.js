@@ -24,6 +24,7 @@ export function depthFirst(grid, startNode, finishNode) {
     // If not update the nodesToVisit array with the neighbors
     const neighbors = getUnvisitedNeighbors(node, grid);
     for (let i = 0; i < neighbors.length; i++) {
+      neighbors[i].previousNode = node;
       nodesToVisit.push(neighbors[i]);
     }
   }

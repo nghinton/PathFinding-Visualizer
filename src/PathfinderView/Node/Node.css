@@ -62,6 +62,7 @@
 }
 
 .node-wall {
+  border: none;
   animation-name: wallAnimation;
   animation-duration: 0.2s;
   animation-timing-function: ease-out;
