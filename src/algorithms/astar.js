@@ -9,7 +9,7 @@ export function astar(grid, startNode, finishNode) {
     // Sort the nodes by distance
     sortNodesByDistance(nodesToVisit);
 
-    console.log(nodesToVisit);
+    console.log(visitedNodesInOrder);
 
     // Pop off the clostest node
     const closestNode = nodesToVisit.shift();
@@ -20,13 +20,16 @@ export function astar(grid, startNode, finishNode) {
     // If we encounter a wall, we skip it.
     if (closestNode.isWall) continue;
 
+    // If the node is already visited skip it
+    if (closestNode.isVisited) continue;
+
     // Otherwise mark it as visited and push it to the returned array
     closestNode.isVisited = true;
     visitedNodesInOrder.push(closestNode);
     
     // Get the neighbors and calculate their distance
     const unvisitedNeighbors = getUnvisitedNeighbors(closestNode, grid);
-    updateUnvisitedNeighbors(unvisitedNeighbors, closestNode, finishNode);
+    updateUnvisitedNeighbors(unvisitedNeighbors, closestNode, startNode, finishNode);
 
     // Then add those neighbors to nodesToVisit
     for (let i = 0; i < unvisitedNeighbors.length; i++) {
@@ -43,10 +46,14 @@ function sortNodesByDistance(nodesToVisit) {
   nodesToVisit.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
 }
 
-function updateUnvisitedNeighbors(unvisitedNeighbors, node, finishNode) {
+function updateUnvisitedNeighbors(unvisitedNeighbors, node, startNode, finishNode) {
   for (const neighbor of unvisitedNeighbors) {
-    // distance calculated as distance from the finish node
-    neighbor.distance = Math.abs(neighbor.row - finishNode.row) + Math.abs(neighbor.col - finishNode.col);
+    // Distance will be used as a psuedo score, calculated
+    // based on minimizing the distance from both the start node 
+    // and finish node
+    const distanceToFinish = Math.abs(neighbor.row - finishNode.row) + Math.abs(neighbor.col - finishNode.col);
+    const distanceToStart = Math.abs(neighbor.row - startNode.row) + Math.abs(neighbor.col - startNode.col);
+    neighbor.distance = distanceToFinish + distanceToStart;
     neighbor.previousNode = node;
   }
 }

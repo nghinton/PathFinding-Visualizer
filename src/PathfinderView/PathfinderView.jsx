@@ -6,12 +6,14 @@ import Dropdown from 'react-bootstrap/Dropdown';
 
 import Node from './Node/Node';
 import { astar } from '../algorithms/astar';
+import { greedyBest } from '../algorithms/greedyBest';
 import { depthFirst } from '../algorithms/depthFirst';
 import { breadthFirst } from '../algorithms/breadthFirst';
 import { randomMaze } from '../algorithms/randomMaze';
 import { primMaze } from '../algorithms/primMaze';
 
 import './PathfinderView.css';
+
 
 const NUMBER_OF_ROWS = Math.floor($(window).innerHeight() * 0.77 / 25);
 const NUMBER_OF_COLUMNS = 60;
@@ -95,12 +97,16 @@ export default class PathfindingView extends Component {
     this.setState({ algorithm: 1, algorithmChoice: 'A* Search'});
   }
 
+  setGreedyBest() {
+    this.setState({ algorithm: 2, algorithmChoice: 'Greedy Best First'});
+  }
+
   setDepthFirst() {
-    this.setState({ algorithm: 2, algorithmChoice: 'Depth First'});
+    this.setState({ algorithm: 3, algorithmChoice: 'Depth First'});
   }
 
   setBreadthFirst() {
-    this.setState({ algorithm: 3, algorithmChoice: 'Breadth First'});
+    this.setState({ algorithm: 4, algorithmChoice: 'Breadth First'});
   }
 
   clearBoard() {
@@ -201,9 +207,12 @@ export default class PathfindingView extends Component {
         this.setState({pathFinding : true}, () => this.visualizeAstar());
         break;
       case(2) :
-        this.setState({pathFinding : true}, () => this.visualizeDepthFirst());
+        this.setState({pathFinding : true}, () => this.visualizeGreedyBest());
         break;
       case(3) :
+        this.setState({pathFinding : true}, () => this.visualizeDepthFirst());
+        break;
+      case(4) :
         this.setState({pathFinding : true}, () => this.visualizeBreadthFirst());
         break;
       default :
@@ -226,6 +235,19 @@ export default class PathfindingView extends Component {
     }, (visitedNodesInOrder.length * 10 + nodesInShortestPathOrder.length * 50) * this.state.speed);
   }
 
+  visualizeGreedyBest() {
+    const grid = this.state.grid;
+    const startNode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+    const finishNode = grid[this.state.FINISH_NODE_ROW][this.state.FINISH_NODE_COL];
+    const visitedNodesInOrder = greedyBest(grid, startNode, finishNode);
+    const nodesInShortestPathOrder = this.getNodesInShortestPathOrder(finishNode);
+    
+    this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
+
+    setTimeout(() => {
+      this.setState({pathFinding: false});
+    }, (visitedNodesInOrder.length * 10 + nodesInShortestPathOrder.length * 50) * this.state.speed);
+  }
   
   visualizeDepthFirst() {
     const grid = this.state.grid;
@@ -321,6 +343,7 @@ export default class PathfindingView extends Component {
 
               <Dropdown.Menu>
                 <Dropdown.Item onClick={() => this.setAstar()}>A* Search</Dropdown.Item>
+                <Dropdown.Item onClick={() => this.setGreedyBest()}>Greedy Best First</Dropdown.Item>
                 <Dropdown.Item onClick={() => this.setDepthFirst()}>Depth First</Dropdown.Item>
                 <Dropdown.Item onClick={() => this.setBreadthFirst()}>Breadth First</Dropdown.Item>
               </Dropdown.Menu>
